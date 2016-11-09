@@ -1,5 +1,11 @@
 #include <pebble.h>
 
+/*
+  This code was written by Jordan Donaldson. It was written in CloudPebble using the Pebble SDK, 
+  C, and JavaScript. It has the following functionalities: time, date, weather, battery level, 
+  Pebble Health, and vibration on disconnection.
+*/
+
 //Variable declarations
 static Window *s_main_window;
 static TextLayer *s_time_layer;
