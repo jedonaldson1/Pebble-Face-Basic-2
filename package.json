@@ -4,12 +4,37 @@
     "keywords": [],
     "name": "basic-watchface",
     "pebble": {
+        "capabilities": [
+            "location"
+        ],
         "displayName": "Basic Watchface",
         "enableMultiJS": true,
-        "messageKeys": [],
+        "messageKeys": [
+            "TEMPERATURE",
+            "CONDITIONS"
+        ],
         "projectType": "native",
         "resources": {
-            "media": []
+            "media": [
+                {
+                    "file": "fonts/GeosansLight.ttf",
+                    "name": "FONT_GEOSANS_LIGHT_18",
+                    "targetPlatforms": null,
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/GeosansLight.ttf",
+                    "name": "FONT_GEOSANS_LIGHT_20",
+                    "targetPlatforms": null,
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/GeosansLight.ttf",
+                    "name": "FONT_GEOSANS_LIGHT_44",
+                    "targetPlatforms": null,
+                    "type": "font"
+                }
+            ]
         },
         "sdkVersion": "3",
         "targetPlatforms": [
