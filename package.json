@@ -1,0 +1,24 @@
+{
+    "author": "Jordan Donaldson",
+    "dependencies": {},
+    "keywords": [],
+    "name": "basic-watchface",
+    "pebble": {
+        "displayName": "Basic Watchface",
+        "enableMultiJS": true,
+        "messageKeys": [],
+        "projectType": "native",
+        "resources": {
+            "media": []
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "basalt"
+        ],
+        "uuid": "5412d7f7-65e9-4f72-918c-6879e9453389",
+        "watchapp": {
+            "watchface": true
+        }
+    },
+    "version": "1.0.0"
+}
