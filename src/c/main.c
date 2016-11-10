@@ -15,6 +15,7 @@ static GFont s_date_font;
 static TextLayer *s_weather_layer;
 static GFont s_weather_font;
 static int s_battery_level;
+static Layer *s_battery_layer; //maybe remove and replace w/ TextLayer
 
 //Updates the time
 static void update_time()
@@ -39,6 +40,26 @@ static void update_time()
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed)
 {
   update_time();
+}
+
+//Sets new battery level and assigns to pointer
+static void battery_callback(BatteryChargeState state)
+{
+  //Record the new battery level
+  s_battery_level = state.charge_percent;
+  //Update meter
+  layer_mark_dirty(s_battery_layer);
+}
+
+//Used to draw battery meter (maybe remove later if printing int)
+static void battery_update_proc(Layer *layer, GContext *ctx)
+{
+  GRect bounds = layer_get_bounds(layer);
+  //Find the width of the bar
+  int width = (int)(float)(((float)s_battery_level / 100.0F) * 141.0F);
+  //Draw the bar
+  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_fill_rect(ctx, GRect(0, 0, width, bounds.size.h), 0, GCornerNone);
 }
 
 //Manages construction of Window's sub-elements
@@ -81,6 +102,12 @@ static void main_window_load(Window *window)
   text_layer_set_font(s_weather_layer, s_weather_font);
   //Add as a child to the Window root laye
   layer_add_child(window_layer, text_layer_get_layer(s_weather_layer));
+  
+  //Create battery meter layer
+  s_battery_layer = layer_create(GRect(0, 160, 142, 2));
+  layer_set_update_proc(s_battery_layer, battery_update_proc);
+  //Add to Window
+  layer_add_child(window_layer, s_battery_layer);
 }
 
 //Manages deconstruction of Window's sub-elements
@@ -92,6 +119,8 @@ static void main_window_unload(Window *window)
   text_layer_destroy(s_date_layer);
   //Destroy weather layer
   text_layer_destroy(s_weather_layer);
+  //Destroy battery layer
+  layer_destroy(s_battery_layer);
   
   //Destroy time font
   fonts_unload_custom_font(s_time_font);
@@ -166,6 +195,11 @@ static void init()
   app_message_register_inbox_dropped(inbox_dropped_callback);
   app_message_register_outbox_failed(outbox_failed_callback);
   app_message_register_outbox_sent(outbox_sent_callback);
+  
+  //Register for battery level updates
+  battery_state_service_subscribe(battery_callback);
+  //Ensure battery level is displayed from the start
+  battery_callback(battery_state_service_peek());
 }
 
 //Handles main deconstruction of watchface
