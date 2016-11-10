@@ -14,6 +14,7 @@ static GFont s_time_font;
 static GFont s_date_font;
 static TextLayer *s_weather_layer;
 static GFont s_weather_font;
+static int s_battery_level;
 
 //Updates the time
 static void update_time()
@@ -115,10 +116,10 @@ static void inbox_received_callback(DictionaryIterator *iterator, void *context)
   //If all data is available, use it
   if(temp_tuple && conditions_tuple)
   {
-    snprintf(temperature_buffer, sizeof(temperature_buffer), "%dF", (int)temp_tuple->value->int32);
+    snprintf(temperature_buffer, sizeof(temperature_buffer), "%d°F", (int)temp_tuple->value->int32);
     snprintf(conditions_buffer, sizeof(conditions_buffer), "%s", conditions_tuple->value->cstring);
     //Assemble full string and display
-    snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s %s", temperature_buffer, conditions_buffer);
+    snprintf(weather_layer_buffer, sizeof(weather_layer_buffer), "%s, %s", temperature_buffer, conditions_buffer);
     text_layer_set_text(s_weather_layer, weather_layer_buffer);
   }
 }
