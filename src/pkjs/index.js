@@ -21,7 +21,7 @@ function locationSuccess(pos) {
       var json = JSON.parse(responseText);
 
       // Temperature in Kelvin requires adjustment
-      var temperature = Math.round((json.main.temp * 1.8) - 450);
+      var temperature = Math.round((json.main.temp * 1.8) - 459.67);
       console.log("Temperature is " + temperature);
 
       // Conditions
