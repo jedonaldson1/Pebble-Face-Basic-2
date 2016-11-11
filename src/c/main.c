@@ -16,6 +16,8 @@ static TextLayer *s_weather_layer;
 static GFont s_weather_font;
 static int s_battery_level;
 static Layer *s_battery_layer; //maybe remove and replace w/ TextLayer
+static BitmapLayer *s_bt_icon_layer;
+static GBitmap *s_bt_icon_bitmap;
 
 //Updates the time
 static void update_time()
@@ -62,6 +64,18 @@ static void battery_update_proc(Layer *layer, GContext *ctx)
   graphics_fill_rect(ctx, GRect(0, 0, width, bounds.size.h), 0, GCornerNone);
 }
 
+//Determines if the phone is connected to the watch
+static void bluetooth_callback(bool connected)
+{
+  //Show icon if disconnected
+  layer_set_hidden(bitmap_layer_get_layer(s_bt_icon_layer), connected);
+  if(!connected)
+  {
+    //Issue a vibrating alert
+    vibes_double_pulse();
+  }
+}
+
 //Manages construction of Window's sub-elements
 static void main_window_load(Window *window)
 {
@@ -93,7 +107,7 @@ static void main_window_load(Window *window)
   
   //Create the TextLayer for the weather with specific bounds
   s_weather_layer = text_layer_create(GRect(0, 0, bounds.size.w, 25));
-  s_weather_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GEOSANS_LIGHT_18));
+  s_weather_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GEOSANS_LIGHT_16));
   //Improve layout
   text_layer_set_background_color(s_weather_layer, GColorClear);
   text_layer_set_text_color(s_weather_layer, GColorWhite);
@@ -108,6 +122,15 @@ static void main_window_load(Window *window)
   layer_set_update_proc(s_battery_layer, battery_update_proc);
   //Add to Window
   layer_add_child(window_layer, s_battery_layer);
+  
+  //Create the bluetooth icon GBitmap
+  s_bt_icon_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BT_ICON);
+  //Create the BitmapLayer to display the GBitmap
+  s_bt_icon_layer = bitmap_layer_create(GRect(120, 0, 16, 18));
+  bitmap_layer_set_bitmap(s_bt_icon_layer, s_bt_icon_bitmap);
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(s_bt_icon_layer));
+  //Show the correct state of the BT connection from the start
+  bluetooth_callback(connection_service_peek_pebble_app_connection());
 }
 
 //Manages deconstruction of Window's sub-elements
@@ -121,6 +144,8 @@ static void main_window_unload(Window *window)
   text_layer_destroy(s_weather_layer);
   //Destroy battery layer
   layer_destroy(s_battery_layer);
+  //Destroy the bitmap layer
+  bitmap_layer_destroy(s_bt_icon_layer);
   
   //Destroy time font
   fonts_unload_custom_font(s_time_font);
@@ -128,6 +153,9 @@ static void main_window_unload(Window *window)
   fonts_unload_custom_font(s_date_font);
   //Destroy weather font
   fonts_unload_custom_font(s_weather_font);
+  
+  //Destroy the bitmap
+  gbitmap_destroy(s_bt_icon_bitmap);
 }
 
 //AppMessage stuff
@@ -179,7 +207,7 @@ static void init()
   //Show the window on the watch, with animated = true
   window_stack_push(s_main_window, true);
   //Sets background color of window
-  window_set_background_color(s_main_window,GColorJazzberryJam);
+  window_set_background_color(s_main_window,GColorBlack);
   
   //Make sure the time is displayed from the start
   update_time();
@@ -200,6 +228,12 @@ static void init()
   battery_state_service_subscribe(battery_callback);
   //Ensure battery level is displayed from the start
   battery_callback(battery_state_service_peek());
+  
+  //Register for Bluetooth connection updates
+  connection_service_subscribe((ConnectionHandlers)
+  {
+    .pebble_app_connection_handler = bluetooth_callback
+  });
 }
 
 //Handles main deconstruction of watchface

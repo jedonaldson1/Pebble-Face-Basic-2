@@ -17,8 +17,14 @@
         "resources": {
             "media": [
                 {
+                    "file": "images/bt-icon.png",
+                    "name": "BT_ICON",
+                    "targetPlatforms": null,
+                    "type": "bitmap"
+                },
+                {
                     "file": "fonts/GeosansLight.ttf",
-                    "name": "FONT_GEOSANS_LIGHT_18",
+                    "name": "FONT_GEOSANS_LIGHT_44",
                     "targetPlatforms": null,
                     "type": "font"
                 },
@@ -30,7 +36,7 @@
                 },
                 {
                     "file": "fonts/GeosansLight.ttf",
-                    "name": "FONT_GEOSANS_LIGHT_44",
+                    "name": "FONT_GEOSANS_LIGHT_16",
                     "targetPlatforms": null,
                     "type": "font"
                 }
